@@ -9,52 +9,72 @@ using std::chrono::milliseconds;
 using std::chrono::time_point;
 using std::chrono::duration_cast;
 
-auto get_time_POSIX()
+auto get_POSIX_time_t()
 {
-  fmt::print("{0:<35}: ", "Using std::time");
-  std::time_t t = std::time(nullptr);
-  fmt::print("{:%d-%m-%Y %H:%M:%S}\n", fmt::localtime(t));
-//  auto a = fmt::format("1. The date is {:%d-%m-%Y %H:%M:%S}.\n", fmt::localtime(t));
-//  return a;
+  std::time_t now = std::time(nullptr);
+  return fmt::format("{:%Y-%m-%d %H:%M:%S%z}\n", fmt::localtime(now));
 }
 
-void time_with_chrono()
+auto get_clock_time_t()
 {
-  fmt::print("{0:<35}: ", "Using system_clock to_time_t");
   std::time_t now = system_clock::to_time_t(system_clock::now());
-  fmt::print("{0:%d-%m-%Y %H:%M:%S}\n", fmt::localtime(now));
+  return fmt::format("{0:%Y-%m-%d %H:%M:%S%z}\n", fmt::localtime(now));
 }
 
-void time_with_ms()
+auto get_clock_time_point_ms()
 {
-  fmt::print("{0:<35}: ", "Using chrono time_point with ms");
   time_point<system_clock> time_now = system_clock::now();
-  auto duration = time_now.time_since_epoch();
-  auto now_ms   = duration_cast<milliseconds>(duration) % 1000;
-  fmt::print("{0:%d-%m-%Y %H:%M:%S}.{1} {0:%z}\n", fmt::localtime(time_now), now_ms.count());
+  auto now_ms = (duration_cast<milliseconds>(time_now.time_since_epoch()) % 1000).count();
+//  auto duration = time_now.time_since_epoch();
+//  auto now_ms   = duration_cast<milliseconds>(duration) % 1000;
+//  fmt::print("{0:%d-%m-%Y %H:%M:%S}.{1} {0:%z}\n", fmt::localtime(time_now), now_ms.count());
+  return fmt::format("{0:%Y-%m-%d %H:%M:%S}.{1}{0:%z}\n", fmt::localtime(time_now), now_ms);
 }
 
-// https://en.wikipedia.org/wiki/ISO_8601
-// Date and time in UTC	2021-03-22T16:07:49+00:00
-// 2021-03-22T16:07:49Z
-// 20210322T160749Z
-void time_ISO8601()
+/// Get time in ISO 8602 using system_clock as time_t
+/// This should be compatible to C time
+/// Date and time in UTC	2021-03-22T16:07:49+00:00
+/// https://en.wikipedia.org/wiki/ISO_8601
+/// \return
+auto get_clock_time_t_ISO8601()
 {
-  fmt::print("{0:<35}: ", "Time as ISO 8601 with UTC");
-  std::time_t now = system_clock::to_time_t(system_clock::now());
-  fmt::print("{0:%Y-%m-%d}T{0:%H:%M:%S}{0:%z}\n", fmt::localtime(now));
+  const std::time_t now = system_clock::to_time_t(system_clock::now());
+  return fmt::format("{0:%Y-%m-%d}T{0:%H:%M:%S}{0:%z}\n", fmt::localtime(now));
 }
 
-int main(int argc, char** argv)
+/// Get time in ISO 8601 using system_clock as time_point
+/// \return
+auto get_clock_time_point_ISO8601()
 {
-  get_time_POSIX();
-  time_with_chrono();
-  time_with_ms();
-//  std::this_thread::sleep_for(1s);
-//  time_with_ms();
+  return fmt::format("{0:%Y-%m-%d}T{0:%H:%M:%S}{0:%z}\n", fmt::localtime(system_clock::now()));
+}
+
+int main()
+{
+  fmt::print("{0:<25}: ", "std::time");
+  fmt::print("{}", get_POSIX_time_t());
+
+  fmt::print("{0:<25}: ", "system_clock to_time_t");
+  fmt::print("{}", get_clock_time_t());
+
+  fmt::print("{0:<25}: ", "time_point with ms");
+  fmt::print("{}", get_clock_time_point_ms());
+
+  fmt::print("Sleep for 1s\n");
+  std::this_thread::sleep_for(1s);
+  fmt::print("{0:<25}: ", "time_point with ms");
+  fmt::print("{}", get_clock_time_point_ms());
+
+  fmt::print("Sleep for 200ms\n");
   std::this_thread::sleep_for(200ms);
-  time_with_ms();
-  time_ISO8601();
+  fmt::print("{0:<25}: ", "time_point with ms");
+  fmt::print("{}", get_clock_time_point_ms());
+
+  fmt::print("{0:<25}: ", "time_t as ISO 8601");
+  fmt::print("{}", get_clock_time_t_ISO8601());
+
+  fmt::print("{0:<25}: ", "time_point as ISO 8601");
+  fmt::print("{}", get_clock_time_point_ISO8601());
 
   return 0;
 }
