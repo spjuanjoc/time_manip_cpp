@@ -2,9 +2,9 @@
 BasedOnStyle: Mozilla
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
-AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: DontAlign
 AlignOperands: Align
 AlignTrailingComments: true
@@ -58,7 +58,7 @@ NamespaceIndentation: None
 PenaltyBreakBeforeFirstCallParameter: 100
 PointerAlignment: Left
 ReflowComments: false
-SortIncludes: true
+SortIncludes: CaseSensitive
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
 SpaceBeforeAssignmentOperators: true
