@@ -15,5 +15,5 @@ target_compile_options(${PROJECT_NAME} INTERFACE ${PROJECT_OPTIONS})
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
-conan_target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CONAN_LIBS})
 message("${CONAN_LIBS}")
