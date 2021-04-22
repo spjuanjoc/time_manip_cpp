@@ -3,12 +3,16 @@
 #include <iomanip>
 #include <iostream>
 #include <thread>
+#include <chrono>
 
 using namespace std::chrono_literals;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
+using std::chrono::microseconds;
+using std::chrono::nanoseconds;
 using std::chrono::system_clock;
 using std::chrono::time_point;
+using high_res_time_point = std::chrono::time_point<system_clock, std::chrono::duration<uint64_t, std::ratio<1, 1000000000>>>;
 
 /**
  * Gets the datetime as std::time to time_t
@@ -87,12 +91,36 @@ std::string get_localtime_system_clock()
 }
 
 /**
+ * Gets the now time with the max possible precision
+ * @return The high resolution time point
+ */
+//auto
+high_res_time_point count()
+{
+  return std::chrono::high_resolution_clock::now();
+}
+
+/**
+ * Calculates the elapsed microseconds since begin to end
+ * @param begin The starting time point
+ * @param end The ending time point
+ * @return The microseconds elapsed
+ */
+auto elapsed_time(const high_res_time_point& begin, const high_res_time_point& end)
+{
+    return duration_cast<nanoseconds>(end - begin).count();
+}
+
+
+/**
  * @see https://en.wikipedia.org/wiki/ISO_8601
  * @see https://en.cppreference.com/w/cpp/io/manip/put_time
  * @see https://www.delftstack.com/es/howto/cpp/how-to-get-time-in-milliseconds-cpp/
  */
 int main()
 {
+  auto start = count();
+
   std::cout << "localtime as std::tm     : ";
   std::cout << get_localtime_tm() << '\n';
 
@@ -120,6 +148,11 @@ int main()
 
   fmt::print("{0:<25}: ", "time_point as ISO 8601");
   fmt::print("{}", get_clock_time_point_ISO8601());
+
+//  std::this_thread::sleep_for(1us);
+  auto end = count();
+
+  fmt::print("elapsed time {} ns", elapsed_time(start, end));
 
   return 0;
 }
