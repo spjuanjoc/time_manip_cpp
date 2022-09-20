@@ -41,11 +41,15 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:         '^<([A-Za-z0-9\/-_])+>'
+  - Regex:         '^((<|")(gtest|gmock|catch))' # test headers have the lowest priority
+    Priority:      5
+  - Regex:         '<[[:alnum:].]+>' # std headers
+    Priority:      4
+  - Regex:         '^"([A-Za-z0-9.\/-_])+"'
     Priority:      3
     CaseSensitive: true
-  - Regex:         '^"([A-Za-z0-9.\/-_])+"'
-    Priority:      4
+  - Regex:         '^<([A-Za-z0-9\/-_])+.h>'
+    Priority:      2
     CaseSensitive: true
 IndentCaseLabels: true
 IndentPPDirectives: BeforeHash
